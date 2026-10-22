@@ -1,0 +1,6 @@
+Note that Example 6 intentionally violates Eathon grammar rules to demonstrate genuine compiler diagnostics.
+
+Let validVar be integer 100.
+Display validVar
+
+Let brokenSyntax = 50;

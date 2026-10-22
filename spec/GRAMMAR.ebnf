@@ -1,0 +1,180 @@
+(* ========================================================================== *)
+(* EATHON PROGRAMMING LANGUAGE - FORMAL DETERMINISTIC GRAMMAR (EBNF)          *)
+(* Version: 1.0.0-core                                                        *)
+(* File Extension: .eat                                                       *)
+(*                                                                            *)
+(* CORE PUNCTUATION INVARIANT:                                                *)
+(* Eathon source code uses ONLY commas (,) and periods (.) as punctuation.    *)
+(* Every executable or declarative statement MUST terminate with a period (.) *)
+(* Clause headers in structured blocks terminate with a comma (,).            *)
+(* Forbidden characters: " ' ; : = + - * / < > ( ) [ ] { }                    *)
+(* ========================================================================== *)
+
+program            = { top_level_item } ;
+
+top_level_item     = comment_stmt
+                   | include_stmt
+                   | struct_def_stmt
+                   | function_def_block
+                   | statement ;
+
+(* 1. Comments & Module Includes *)
+comment_stmt       = "Note" "that" { any_word_or_comma } "." ;
+include_stmt       = "Include" "module" identifier "." ;
+
+(* 2. Data Types *)
+type_name          = "integer"
+                   | "byte"
+                   | "boolean"
+                   | "text"
+                   | "address" ;
+
+(* 3. Statements *)
+statement          = comment_stmt
+                   | let_stmt
+                   | set_stmt
+                   | display_stmt
+                   | exit_stmt
+                   | if_block
+                   | while_block
+                   | repeat_block
+                   | return_stmt
+                   | call_stmt
+                   | array_alloc_stmt
+                   | array_store_stmt
+                   | array_load_stmt
+                   | mem_alloc_stmt
+                   | mem_write_stmt
+                   | mem_read_stmt
+                   | struct_create_stmt
+                   | struct_set_stmt
+                   | struct_get_stmt
+                   | tensor_create_stmt
+                   | tensor_fill_stmt
+                   | tensor_set_stmt
+                   | tensor_get_stmt
+                   | tensor_mul_stmt
+                   | tensor_relu_stmt
+                   | tensor_sum_stmt
+                   | db_open_stmt
+                   | db_insert_stmt
+                   | db_query_stmt ;
+
+(* 3.1 Variable Declarations and Assignments *)
+let_stmt           = "Let" identifier "be" [ type_name ] ( expression | bare_text_literal ) "." ;
+set_stmt           = "Set" identifier "to" ( expression | bare_text_literal ) "." ;
+bare_text_literal  = { word_or_number } "end" "text" ;
+
+(* 3.2 System I/O and Process Control *)
+display_stmt       = "Display" display_item { "," display_item } "." ;
+display_item       = expression | unquoted_phrase ;
+exit_stmt          = "Exit" "with" expression "." ;
+
+(* 3.3 Structured Control Flow *)
+if_block           = "If" expression "then" ","
+                       { statement }
+                     [ "Otherwise" ","
+                       { statement } ]
+                     "End" "if" "." ;
+
+while_block        = "While" expression "repeat" ","
+                       { statement }
+                     "End" "while" "." ;
+
+repeat_block       = "Repeat" expression "times" ","
+                       { statement }
+                     "End" "repeat" "." ;
+
+(* 3.4 Functions and Procedures *)
+function_def_block = "To" "compute" identifier
+                     [ "taking" param_list ]
+                     "returning" type_name ","
+                       { statement }
+                     "End" "function" "." ;
+
+param_list         = param_decl { "," param_decl } ;
+param_decl         = identifier "as" type_name ;
+
+return_stmt        = "Return" expression "." ;
+call_stmt          = "Call" identifier [ "with" arg_list ] "into" identifier "." ;
+arg_list           = expression { "," expression } ;
+
+(* 3.5 Arrays and Controlled Memory Access *)
+array_alloc_stmt   = "Allocate" "array" identifier "of" expression "integers" "." ;
+array_store_stmt   = "Store" expression "into" "element" expression "of" identifier "." ;
+array_load_stmt    = "Load" "element" expression "of" identifier "into" identifier "." ;
+
+mem_alloc_stmt     = "Allocate" "memory" identifier "of" expression "bytes" "." ;
+mem_write_stmt     = "Write" expression "at" "address" identifier "offset" expression "." ;
+mem_read_stmt      = "Read" "integer" "from" "address" identifier "offset" expression "into" identifier "." ;
+
+(* 3.6 Structures *)
+struct_def_stmt    = "Define" "structure" identifier "with" "fields" field_decl_list "." ;
+field_decl_list    = field_decl { "," field_decl } ;
+field_decl         = identifier "as" type_name ;
+
+struct_create_stmt = "Create" identifier "as" identifier "." ;
+struct_set_stmt    = "Set" "field" identifier "of" identifier "to" expression "." ;
+struct_get_stmt    = "Get" "field" identifier "of" identifier "into" identifier "." ;
+
+(* 3.7 Native AI / Tensor Operations *)
+tensor_create_stmt = "Create" "tensor" identifier "with" "dimensions" expression "," expression "." ;
+tensor_fill_stmt   = "Fill" "tensor" identifier "with" expression "." ;
+tensor_set_stmt    = "Set" "cell" expression "," expression "of" identifier "to" expression "." ;
+tensor_get_stmt    = "Get" "cell" expression "," expression "of" identifier "into" identifier "." ;
+tensor_mul_stmt    = "Multiply" "tensor" identifier "by" "tensor" identifier "into" identifier "." ;
+tensor_relu_stmt   = "Activate" "relu" "on" "tensor" identifier "." ;
+tensor_sum_stmt    = "Sum" "tensor" identifier "into" identifier "." ;
+
+(* 3.8 Embedded EathonDB Persistence Statements *)
+db_open_stmt       = "Open" "database" identifier "." ;
+db_insert_stmt     = "Insert" "key" expression "with" "value" expression "into" identifier "." ;
+db_query_stmt      = "Query" "key" expression "from" identifier "into" identifier "." ;
+
+(* 4. Deterministic Expression Hierarchy *)
+expression         = logical_or_expr ;
+
+logical_or_expr    = logical_and_expr { "or" logical_and_expr } ;
+logical_and_expr   = comparison_expr { "and" comparison_expr } ;
+
+comparison_expr    = additive_expr [ comp_op additive_expr ] ;
+comp_op            = "is" "equal" "to"
+                   | "is" "not" "equal" "to"
+                   | "is" "greater" "than"
+                   | "is" "less" "than"
+                   | "is" "at" "least"
+                   | "is" "at" "most" ;
+
+additive_expr      = multiplicative_expr { add_op multiplicative_expr } ;
+add_op             = "plus"
+                   | "minus"
+                   | "bitwise" "or"
+                   | "bitwise" "xor" ;
+
+multiplicative_expr = unary_expr { mul_op unary_expr } ;
+mul_op             = "times"
+                   | "divided" "by"
+                   | "modulo"
+                   | "bitwise" "and"
+                   | "shifted" "left" "by"
+                   | "shifted" "right" "by" ;
+
+unary_expr         = "neg" unary_expr
+                   | "not" unary_expr
+                   | "bitwise" "not" unary_expr
+                   | primary_expr ;
+
+primary_expr       = integer_literal
+                   | boolean_literal
+                   | text_literal
+                   | "element" primary_expr "of" identifier
+                   | "field" identifier "of" identifier
+                   | "result" "of" identifier [ "with" arg_list ]
+                   | identifier ;
+
+integer_literal    = digit { digit } ;
+boolean_literal    = "true" | "false" ;
+text_literal       = "text" "of" { word_or_number } "end" "text" ;
+identifier         = letter { letter | digit } ;
+letter             = "A".."Z" | "a".."z" ;
+digit              = "0".."9" ;

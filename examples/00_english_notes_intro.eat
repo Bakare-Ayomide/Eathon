@@ -1,0 +1,13 @@
+Note that this program calculates a person's age.
+
+Let age be 25.
+Let name be Chris end text.
+
+If age is greater than 17 then,
+    Display Hello, name.
+Otherwise,
+    Display You are underage.
+End if.
+
+Let yearsToRetirement be 65 minus age.
+Display Years until retirement, yearsToRetirement.

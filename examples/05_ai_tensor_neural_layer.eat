@@ -1,0 +1,34 @@
+Note that Example 5 demonstrates native 2D Tensor allocation, matrix multiplication, ReLU activation, and reduction.
+
+Display text of Eathon Native AI Tensor and ReLU Forward Pass end text.
+
+Create tensor weights with dimensions 2, 2.
+Set cell 0, 0 of weights to 3.
+Set cell 0, 1 of weights to neg 2.
+Set cell 1, 0 of weights to 4.
+Set cell 1, 1 of weights to 5.
+
+Create tensor inputs with dimensions 2, 2.
+Set cell 0, 0 of inputs to 2.
+Set cell 0, 1 of inputs to 6.
+Set cell 1, 0 of inputs to 1.
+Set cell 1, 1 of inputs to 3.
+
+Create tensor activations with dimensions 2, 2.
+Multiply tensor weights by tensor inputs into activations.
+
+Get cell 0, 0 of activations into c00.
+Display c00.
+
+Get cell 0, 1 of activations into c01.
+Display c01.
+
+Note that cell 0, 0 is 3 times 2 plus neg 2 times 1 which is 4, and we also test ReLU clamping on negative cells.
+Set cell 0, 1 of activations to neg 15.
+Activate relu on tensor activations.
+
+Get cell 0, 1 of activations into clampedCell.
+Display clampedCell.
+
+Sum tensor activations into totalActivation.
+Display totalActivation.

@@ -1,0 +1,23 @@
+Note that Milestone 1 verifies variables, English arithmetic expressions, precedence, and native ELF64 binary execution.
+
+Display text of Eathon Native Execution Milestone 1 end text.
+
+Let base be integer 120.
+Let factor be integer 4.
+Let bonus be integer 35.
+
+Note that multiplication binds tighter than addition in Eathon deterministic grammar.
+Let total be base plus factor times bonus.
+Display total.
+
+Let difference be total minus 60.
+Display difference.
+
+Let quotient be difference divided by 5.
+Display quotient.
+
+Let remainder be total modulo 7.
+Display remainder.
+
+Set base to base plus 80.
+Display base.

@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Eathon: Run Current .eat Program (--run)",
+      "type": "shell",
+      "command": "${workspaceFolder}/bin/eathonc",
+      "windows": {
+        "command": "${workspaceFolder}\\bin\\eathonc.exe"
+      },
+      "args": [
+        "${file}",
+        "--run"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Eathon: Compile Current .eat File to Native Binary (C99 + GCC)",
+      "type": "shell",
+      "command": "${workspaceFolder}/bin/eathonc",
+      "windows": {
+        "command": "${workspaceFolder}\\bin\\eathonc.exe"
+      },
+      "args": [
+        "${file}",
+        "-o",
+        "${fileDirname}/${fileBasenameNoExtension}",
+        "--cc",
+        "gcc"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always"
+      }
+    }
+  ]
+}

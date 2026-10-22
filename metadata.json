@@ -1,0 +1,6 @@
+{
+  "name": "Eathon Language & Native Compiler Toolchain",
+  "description": "Production-grade English-syntax systems programming language (.eat) with a native x86_64 ELF64/PE64 compiler, LLVM IR & C99 backends, custom binary page-based database engine (EathonDB), and interactive compiler workbench.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

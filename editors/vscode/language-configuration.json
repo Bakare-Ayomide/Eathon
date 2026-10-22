@@ -1,0 +1,16 @@
+{
+  "comments": {
+    "blockComment": ["Note that ", "."]
+  },
+  "brackets": [],
+  "autoClosingPairs": [
+    { "open": "text of ", "close": " end text" },
+    { "open": "If ", "close": " then,\n  \nEnd if." },
+    { "open": "While ", "close": " repeat,\n  \nEnd while." },
+    { "open": "Repeat ", "close": " times,\n  \nEnd repeat." }
+  ],
+  "indentationRules": {
+    "increaseIndentPattern": "^\\s*(If\\b.*\\bthen,|Otherwise,|While\\b.*\\brepeat,|Repeat\\b.*\\btimes,|To\\s+compute\\b.*,)$",
+    "decreaseIndentPattern": "^\\s*(Otherwise,|End\\s+(if|while|repeat|function)\\.)\\s*$"
+  }
+}

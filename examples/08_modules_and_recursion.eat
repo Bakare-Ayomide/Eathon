@@ -1,0 +1,17 @@
+Note that Example 08 demonstrates the Eathon module system and true stack frame recursion across both ELF64 and C99 backends.
+
+Include module mathlib.
+
+Display Eathon Modules and Native Recursion Suite.
+
+Call absVal with neg 42 into positiveFortyTwo.
+Display Absolute value of neg 42, positiveFortyTwo.
+
+Call clampVal with 180, 0, 100 into clampedPercent.
+Display Clamped percentage, clampedPercent.
+
+Call power with 3, 5 into threeToFifth.
+Display Three to the fifth power, threeToFifth.
+
+Call factorial with 6 into factSix.
+Display Factorial of 6, factSix.

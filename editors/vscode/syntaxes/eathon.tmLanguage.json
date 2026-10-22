@@ -1,0 +1,153 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Eathon",
+  "scopeName": "source.eathon",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#illegal_punctuation" },
+    { "include": "#declarations" },
+    { "include": "#control_keywords" },
+    { "include": "#types" },
+    { "include": "#operators" },
+    { "include": "#constants" },
+    { "include": "#punctuation" },
+    { "include": "#identifiers" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.documentation.eathon",
+          "begin": "\\b(?i:Note\\s+that)\\b",
+          "beginCaptures": {
+            "0": { "name": "keyword.other.documentation.eathon" }
+          },
+          "end": "\\.",
+          "endCaptures": {
+            "0": { "name": "punctuation.terminator.comment.eathon" }
+          }
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.unquoted.explicit.eathon",
+          "begin": "\\b(?i:text\\s+of)\\b",
+          "beginCaptures": {
+            "0": { "name": "keyword.operator.string.begin.eathon" }
+          },
+          "end": "\\b(?i:end\\s+text)\\b",
+          "endCaptures": {
+            "0": { "name": "keyword.operator.string.end.eathon" }
+          }
+        },
+        {
+          "name": "string.unquoted.short.eathon",
+          "match": "(?<=\\bbe\\s+|\\bto\\s+)([A-Za-z0-9 ,]+?)\\s+\\b(?i:end\\s+text)\\b",
+          "captures": {
+            "1": { "name": "string.unquoted.eathon" },
+            "2": { "name": "keyword.operator.string.end.eathon" }
+          }
+        }
+      ]
+    },
+    "illegal_punctuation": {
+      "patterns": [
+        {
+          "name": "invalid.illegal.punctuation.eathon",
+          "match": "[\"' equals;:{}\\[\\]()+\\-*/<>!@#$%^&|~`?\\\\]"
+        }
+      ]
+    },
+    "declarations": {
+      "patterns": [
+        {
+          "name": "meta.function.definition.eathon",
+          "match": "\\b(?i:To\\s+compute)\\s+([A-Za-z][A-Za-z0-9]*)",
+          "captures": {
+            "0": { "name": "keyword.declaration.function.eathon" },
+            "1": { "name": "entity.name.function.eathon" }
+          }
+        },
+        {
+          "name": "meta.function.call.eathon",
+          "match": "\\b(?i:Call|result\\s+of)\\s+([A-Za-z][A-Za-z0-9]*)",
+          "captures": {
+            "0": { "name": "keyword.other.call.eathon" },
+            "1": { "name": "entity.name.function.call.eathon" }
+          }
+        },
+        {
+          "name": "keyword.declaration.eathon",
+          "match": "\\b(?i:Let|be|Set|to|Define\\s+structure|with\\s+fields|Create|Allocate\\s+array|Allocate\\s+memory|Store|Load|Write|Read|Get|Fill\\s+tensor|Multiply\\s+tensor|Activate\\s+relu|Sum\\s+tensor|Open\\s+database|Insert\\s+key|Query\\s+key|Include\\s+module|taking|as|returning|into|from|offset)\\b"
+        }
+      ]
+    },
+    "control_keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.eathon",
+          "match": "\\b(?i:If|then|Otherwise|End\\s+if|While|repeat|End\\s+while|Repeat|End\\s+repeat|End\\s+function|Return|Display|Exit\\s+with|Begin\\s+transaction|Commit\\s+transaction|Rollback\\s+transaction|Select\\s+all|Select\\s+where)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.eathon",
+          "match": "\\b(?i:integer|integers|byte|bytes|boolean|text|address|array|memory|structure|tensor|dimensions|database|collection)\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.comparison.eathon",
+          "match": "\\b(?i:is\\s+not\\s+equal\\s+to|is\\s+equal\\s+to|is\\s+greater\\s+than|is\\s+less\\s+than|is\\s+at\\s+least|is\\s+at\\s+most)\\b"
+        },
+        {
+          "name": "keyword.operator.bitwise.eathon",
+          "match": "\\b(?i:bitwise\\s+and|bitwise\\s+or|bitwise\\s+xor|bitwise\\s+not|shifted\\s+left\\s+by|shifted\\s+right\\s+by)\\b"
+        },
+        {
+          "name": "keyword.operator.arithmetic.eathon",
+          "match": "\\b(?i:plus|minus|times|divided\\s+by|modulo|neg|and|or|not|element|field|cell|of|by|on|at|with|key|value)\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.numeric.integer.eathon",
+          "match": "\\b[0-9]+\\b"
+        },
+        {
+          "name": "constant.language.boolean.eathon",
+          "match": "\\b(?i:true|false)\\b"
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.terminator.statement.eathon",
+          "match": "\\."
+        },
+        {
+          "name": "punctuation.separator.clause.eathon",
+          "match": ","
+        }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "name": "variable.other.eathon",
+          "match": "\\b[A-Za-z][A-Za-z0-9]*\\b"
+        }
+      ]
+    }
+  }
+}

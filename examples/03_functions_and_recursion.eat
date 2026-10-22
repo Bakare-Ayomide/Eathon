@@ -1,0 +1,25 @@
+Note that Example 3 demonstrates parameterized native functions and System V AMD64 ABI calls.
+
+To compute polynomial taking x as integer, coeff as integer returning integer,
+  Let squared be x times x.
+  Let term be squared times coeff.
+  Let answer be term plus x times 3 plus 7.
+  Return answer.
+End function.
+
+To compute kineticEnergy taking mass as integer, velocity as integer returning integer,
+  Let vSquared be velocity times velocity.
+  Let numerator be mass times vSquared.
+  Return numerator divided by 2.
+End function.
+
+Display text of Eathon Native Functions and ABI Verification end text.
+
+Call polynomial with 5, 4 into polyResult.
+Display polyResult.
+
+Call kineticEnergy with 12, 10 into energyResult.
+Display energyResult.
+
+Let combined be polyResult plus energyResult.
+Display combined.

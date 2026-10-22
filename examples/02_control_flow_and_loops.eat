@@ -1,0 +1,29 @@
+Note that Example 2 demonstrates conditionals, While loops, and Repeat loops computing Fibonacci numbers.
+
+Display text of Eathon Control Flow and Fibonacci Sequence end text.
+
+Let n be integer 10.
+Let a be integer 0.
+Let b be integer 1.
+Let step be integer 0.
+
+While step is less than n repeat,
+  Display a.
+  Let next be a plus b.
+  Set a to b.
+  Set b to next.
+  Set step to step plus 1.
+End while.
+
+If a is greater than 30 then,
+  Display text of Final Fibonacci value exceeds threshold 30 end text.
+  Display a.
+Otherwise,
+  Display text of Below threshold end text.
+End if.
+
+Let countdown be integer 3.
+Repeat 3 times,
+  Display countdown.
+  Set countdown to countdown minus 1.
+End repeat.

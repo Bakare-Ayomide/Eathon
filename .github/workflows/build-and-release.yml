@@ -1,0 +1,219 @@
+name: Eathon Cross-Platform Build, Verification & Release
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Linux x86_64 Native Build, ELF64 + C99 Verification & Project ZIP Bundle
+  # ---------------------------------------------------------------------------
+  linux-build-and-test:
+    name: Linux x86_64 Native Toolchain & Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install GCC & Python 3
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3
+
+      - name: Setup Node.js for Automated Verification Suite
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Compile Eathon Native Compiler (eathonc) & Database Engine (eatdb)
+        run: |
+          mkdir -p bin
+          gcc -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eathonc.c -o bin/eathonc
+          gcc -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eatdb.c -o bin/eatdb
+
+      - name: Run Automated Compiler & Database Verification Suite
+        run: |
+          node tests/run_tests.mjs
+
+      - name: Package Linux Release Archive & Full Eathon Project ZIP
+        run: |
+          python3 scripts/package_zip.py
+          mkdir -p dist/linux-x86_64
+          cp bin/eathonc bin/eatdb dist/linux-x86_64/
+          cp -r stdlib examples grammar editors doc.md dist/linux-x86_64/
+          tar -czf dist/eathon-linux-x86_64.tar.gz -C dist/linux-x86_64 .
+
+      - name: Upload Linux Native Artifacts & Complete Project ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: eathon-linux-x86_64-and-project-zip
+          path: |
+            dist/eathon-linux-x86_64.tar.gz
+            public/eathon-project.zip
+
+  # ---------------------------------------------------------------------------
+  # 2. Windows x86_64 Native Build on Real Windows Runner (windows-latest)
+  # ---------------------------------------------------------------------------
+  windows-native-build:
+    name: Windows x86_64 Native Toolchain (eathonc.exe & eatdb.exe)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MinGW-w64 GCC on Windows Runner
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: mingw-w64-x86_64-gcc
+
+      - name: Compile Native Windows Executables (eathonc.exe & eatdb.exe)
+        shell: msys2 {0}
+        run: |
+          mkdir -p bin dist/windows-x86_64
+          gcc -O2 -Wall -Wextra -std=c99 -static -Icompiler/include compiler/src/eathonc.c -o bin/eathonc.exe
+          gcc -O2 -Wall -Wextra -std=c99 -static -Icompiler/include compiler/src/eatdb.c -o bin/eatdb.exe
+
+      - name: Verify eathonc.exe & eatdb.exe Execution on Native Windows OS
+        shell: msys2 {0}
+        run: |
+          ./bin/eathonc.exe examples/00_english_notes_intro.eat --run
+          ./bin/eathonc.exe examples/08_modules_and_recursion.eat -o bin/test_win.exe --cc gcc
+          ./bin/test_win.exe
+          ./bin/eatdb.exe bin/win_verify.eatdb "Create collection win_nodes. Insert key 1, label win64, value 2025. Select all."
+
+      - name: Package Windows Toolchain, Runtime Header & Standard Library
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/windows-x86_64/bin | Out-Null
+          New-Item -ItemType Directory -Force -Path dist/windows-x86_64/include | Out-Null
+          Copy-Item bin/eathonc.exe dist/windows-x86_64/bin/
+          Copy-Item bin/eatdb.exe dist/windows-x86_64/bin/
+          Copy-Item compiler/include/eathon_platform.h dist/windows-x86_64/include/
+          Copy-Item -Recurse stdlib dist/windows-x86_64/stdlib
+          Copy-Item -Recurse examples dist/windows-x86_64/examples
+          Copy-Item -Recurse editors dist/windows-x86_64/editors
+          Copy-Item scripts/build_windows.bat dist/windows-x86_64/
+          Copy-Item doc.md dist/windows-x86_64/
+          Compress-Archive -Path dist/windows-x86_64/* -DestinationPath dist/eathon-windows-x86_64.zip -Force
+
+      - name: Upload Windows Native Executables & Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: eathon-windows-x86_64
+          path: |
+            bin/eathonc.exe
+            bin/eatdb.exe
+            dist/eathon-windows-x86_64.zip
+
+  # ---------------------------------------------------------------------------
+  # 3. macOS Native Build (Apple Silicon / Intel Clang)
+  # ---------------------------------------------------------------------------
+  macos-native-build:
+    name: macOS Native Toolchain (Clang)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compile Eathon on macOS with Clang
+        run: |
+          mkdir -p bin dist/macos
+          clang -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eathonc.c -o bin/eathonc
+          clang -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eatdb.c -o bin/eatdb
+          ./bin/eathonc examples/00_english_notes_intro.eat --run
+          ./bin/eathonc examples/08_modules_and_recursion.eat -o bin/test_mac --cc clang
+          ./bin/test_mac
+
+      - name: Archive macOS Artifacts
+        run: |
+          cp bin/eathonc bin/eatdb dist/macos/
+          cp -r stdlib examples editors doc.md dist/macos/
+          tar -czf dist/eathon-macos.tar.gz -C dist/macos .
+
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eathon-macos
+          path: dist/eathon-macos.tar.gz
+
+  # ---------------------------------------------------------------------------
+  # 4. Android Native Studio APK Build (Android SDK + NDK CMake + JNI)
+  # ---------------------------------------------------------------------------
+  android-apk-build:
+    name: Android Studio APK (Eathon Mobile IDE + Native JNI Compiler)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK & NDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK & CMake Components
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;26.1.10909125" "cmake;3.22.1"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+
+      - name: Build Android APK (Debug & Release Unsigned) with Native libeathon_jni.so
+        working-directory: android
+        run: |
+          gradle assembleDebug
+          mkdir -p ../dist
+          cp app/build/outputs/apk/debug/app-debug.apk ../dist/eathon-studio-android.apk
+
+      - name: Upload Android APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eathon-studio-android-apk
+          path: dist/eathon-studio-android.apk
+
+  # ---------------------------------------------------------------------------
+  # 5. Publish GitHub Release on Tag Push (v*)
+  # ---------------------------------------------------------------------------
+  release:
+    name: Publish GitHub Release Artifacts
+    needs:
+      - linux-build-and-test
+      - windows-native-build
+      - macos-native-build
+      - android-apk-build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download All Built Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: Create GitHub Release and Attach Binaries & APK
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            release-assets/eathon-linux-x86_64-and-project-zip/public/eathon-project.zip
+            release-assets/eathon-linux-x86_64-and-project-zip/dist/eathon-linux-x86_64.tar.gz
+            release-assets/eathon-windows-x86_64/bin/eathonc.exe
+            release-assets/eathon-windows-x86_64/bin/eatdb.exe
+            release-assets/eathon-windows-x86_64/dist/eathon-windows-x86_64.zip
+            release-assets/eathon-macos/dist/eathon-macos.tar.gz
+            release-assets/eathon-studio-android-apk/dist/eathon-studio-android.apk

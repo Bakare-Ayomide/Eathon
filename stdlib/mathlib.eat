@@ -1,0 +1,50 @@
+Note that mathlib is the standard Eathon mathematics module providing reusable functions and recursion.
+
+To compute absVal taking x as integer returning integer,
+  If x is less than 0 then,
+    Return neg x.
+  End if.
+  Return x.
+End function.
+
+To compute maxVal taking a as integer, b as integer returning integer,
+  If a is greater than b then,
+    Return a.
+  End if.
+  Return b.
+End function.
+
+To compute minVal taking a as integer, b as integer returning integer,
+  If a is less than b then,
+    Return a.
+  End if.
+  Return b.
+End function.
+
+To compute clampVal taking val as integer, low as integer, high as integer returning integer,
+  If val is less than low then,
+    Return low.
+  End if.
+  If val is greater than high then,
+    Return high.
+  End if.
+  Return val.
+End function.
+
+To compute power taking base as integer, exp as integer returning integer,
+  If exp is at most 0 then,
+    Return 1.
+  End if.
+  Let prevExp be exp minus 1.
+  Call power with base, prevExp into subPower.
+  Return base times subPower.
+End function.
+
+To compute factorial taking n as integer returning integer,
+  If n is at most 1 then,
+    Return 1.
+  End if.
+  Let prevN be n minus 1.
+  Call factorial with prevN into subFact.
+  Return n times subFact.
+End function.

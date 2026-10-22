@@ -1,0 +1,15 @@
+{
+  "id": "org.eathon.syntax.acode",
+  "name": "Eathon Language Syntax (.eat)",
+  "main": "main.js",
+  "version": "1.1.0",
+  "readme": "../../doc.md",
+  "icon": "",
+  "files": [],
+  "minVersionCode": 290,
+  "author": {
+    "name": "Eathon Language Project",
+    "email": "dev@eathon.org",
+    "github": "eathon-lang"
+  }
+}

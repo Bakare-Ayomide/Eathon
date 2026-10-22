@@ -1,0 +1,38 @@
+Note that Example 4 demonstrates systems programming, bitwise operations, arrays, structures, and direct memory access.
+
+Display text of Eathon Systems Programming Memory and Bitwise Suite end text.
+
+Let flags be integer 42.
+Let mask be integer 15.
+Let masked be flags bitwise and mask.
+Display masked.
+
+Let combinedBits be flags bitwise or 128.
+Display combinedBits.
+
+Let toggledBits be flags bitwise xor 10.
+Display toggledBits.
+
+Let shiftedUp be 3 shifted left by 4.
+Display shiftedUp.
+
+Allocate array readings of 4 integers.
+Store 1024 into element 0 of readings.
+Store 2048 into element 1 of readings.
+Store 4096 into element 2 of readings.
+
+Load element 1 of readings into secondReading.
+Display secondReading.
+
+Allocate memory region of 64 bytes.
+Write 9001 at address region offset 0.
+Write 18002 at address region offset 8.
+Read integer from address region offset 8 into memVal.
+Display memVal.
+
+Define structure PacketHeader with fields version as integer, payloadLength as integer.
+Create pkt as PacketHeader.
+Set field version of pkt to 6.
+Set field payloadLength of pkt to 1480.
+Get field payloadLength of pkt into pktLen.
+Display pktLen.

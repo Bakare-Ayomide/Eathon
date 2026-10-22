@@ -1,0 +1,88 @@
+Note that Program 07 is a comprehensive audit verification test exercising every working subsystem in Eathon.
+
+To compute linearTransform taking x as integer, weight as integer, bias as integer returning integer,
+  Let weighted be x times weight.
+  Return weighted plus bias.
+End function.
+
+Display text of Eathon Audit Verification Suite Starting end text.
+
+Note that 1 verifies arithmetic precedence and negative unary operators.
+Let alpha be integer 50.
+Let beta be integer 12.
+Let gamma be alpha plus beta times 4 minus neg 10.
+Display gamma.
+
+Note that 2 verifies conditionals and relational comparisons.
+If gamma is equal to 108 then,
+  Display text of Precedence Check Passed end text.
+Otherwise,
+  Display text of Precedence Check Failed end text.
+End if.
+
+Note that 3 verifies While and Repeat loops.
+Let sumLoop be integer 0.
+Let idx be integer 1.
+While idx is at most 6 repeat,
+  Set sumLoop to sumLoop plus idx.
+  Set idx to idx plus 1.
+End while.
+
+Repeat 4 times,
+  Set sumLoop to sumLoop plus 100.
+End repeat.
+Display sumLoop.
+
+Note that 4 verifies function call with 3 parameters.
+Call linearTransform with 15, 3, 25 into transformed.
+Display transformed.
+
+Note that 5 verifies bitwise operations, arrays, raw memory offsets, and structures.
+Let bitVal be 9 shifted left by 3 bitwise or 5.
+Display bitVal.
+
+Allocate array table of 4 integers.
+Store 31415 into element 3 of table.
+Load element 3 of table into arrOut.
+Display arrOut.
+
+Allocate memory block of 32 bytes.
+Write 65535 at address block offset 16.
+Read integer from address block offset 16 into memOut.
+Display memOut.
+
+Define structure Vector2D with fields vx as integer, vy as integer.
+Create vec as Vector2D.
+Set field vx of vec to 300.
+Set field vy of vec to 400.
+Get field vx of vec into vxVal.
+Get field vy of vec into vyVal.
+Let manhattan be vxVal plus vyVal.
+Display manhattan.
+
+Note that 6 verifies 2D Tensor matrix multiplication, ReLU clamping, and reduction sum.
+Create tensor matA with dimensions 2, 2.
+Set cell 0, 0 of matA to 4.
+Set cell 0, 1 of matA to neg 3.
+Set cell 1, 0 of matA to 2.
+Set cell 1, 1 of matA to 5.
+
+Create tensor matB with dimensions 2, 2.
+Set cell 0, 0 of matB to 1.
+Set cell 0, 1 of matB to 2.
+Set cell 1, 0 of matB to 3.
+Set cell 1, 1 of matB to 4.
+
+Create tensor matC with dimensions 2, 2.
+Multiply tensor matA by tensor matB into matC.
+Activate relu on tensor matC.
+Sum tensor matC into tensorTotal.
+Display tensorTotal.
+
+Note that 7 verifies key value table operations.
+Open database kvStore.
+Insert key 7 with value 8888 into kvStore.
+Query key 7 from kvStore into kvOut.
+Display kvOut.
+
+Display text of Eathon Audit Verification Suite Complete end text.
