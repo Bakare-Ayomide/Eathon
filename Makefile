@@ -1,6 +1,6 @@
 # ============================================================================
 # EATHON COMPILER & DATABASE ENGINE BUILD CONFIGURATION
-# Supports Linux, macOS, and Windows (MinGW-w64 / LLVM Clang)
+# Supports Linux, macOS, Android JNI, and Windows (MinGW-w64 / LLVM Clang)
 # ============================================================================
 
 CC       = gcc
@@ -10,25 +10,25 @@ BINDIR   = bin
 SRCDIR   = compiler/src
 JNISRC   = android/app/src/main/cpp/eathon_jni.c
 
-all: $(BINDIR)/eathonc $(BINDIR)/eatdb $(BINDIR)/libeathon_jni.so windows
+all: $(BINDIR)/eathon $(BINDIR)/eatdb $(BINDIR)/libeathon_jni.so windows
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
-$(BINDIR)/eathonc: $(SRCDIR)/eathonc.c compiler/include/eathon_platform.h | $(BINDIR)
-	$(CC) $(CFLAGS) $(SRCDIR)/eathonc.c -o $(BINDIR)/eathonc
+$(BINDIR)/eathon: $(SRCDIR)/eathon.c compiler/include/eathon_platform.h | $(BINDIR)
+	$(CC) $(CFLAGS) $(SRCDIR)/eathon.c -o $(BINDIR)/eathon
 
 $(BINDIR)/eatdb: $(SRCDIR)/eatdb.c compiler/include/eathon_platform.h | $(BINDIR)
 	$(CC) $(CFLAGS) $(SRCDIR)/eatdb.c -o $(BINDIR)/eatdb
 
-$(BINDIR)/libeathon_jni.so: $(JNISRC) $(SRCDIR)/eathonc.c $(SRCDIR)/eatdb.c compiler/include/eathon_platform.h | $(BINDIR)
-	$(CC) $(CFLAGS) -fPIC -shared -DEATHON_LIB_MODE $(JNISRC) $(SRCDIR)/eathonc.c $(SRCDIR)/eatdb.c -o $(BINDIR)/libeathon_jni.so
+$(BINDIR)/libeathon_jni.so: $(JNISRC) $(SRCDIR)/eathon.c $(SRCDIR)/eatdb.c compiler/include/eathon_platform.h | $(BINDIR)
+	$(CC) $(CFLAGS) -fPIC -shared -DEATHON_LIB_MODE $(JNISRC) $(SRCDIR)/eathon.c $(SRCDIR)/eatdb.c -o $(BINDIR)/libeathon_jni.so
 
-windows: $(BINDIR)/eathonc.exe $(BINDIR)/eatdb.exe
+windows: $(BINDIR)/eathon.exe $(BINDIR)/eatdb.exe
 
-$(BINDIR)/eathonc.exe: $(SRCDIR)/eathonc.c compiler/include/eathon_platform.h | $(BINDIR)
+$(BINDIR)/eathon.exe: $(SRCDIR)/eathon.c compiler/include/eathon_platform.h | $(BINDIR)
 	@if command -v $(WINCC) >/dev/null 2>&1; then \
-		$(WINCC) $(CFLAGS) -static $(SRCDIR)/eathonc.c -o $(BINDIR)/eathonc.exe; \
+		$(WINCC) $(CFLAGS) -static $(SRCDIR)/eathon.c -o $(BINDIR)/eathon.exe; \
 	fi
 
 $(BINDIR)/eatdb.exe: $(SRCDIR)/eatdb.c compiler/include/eathon_platform.h | $(BINDIR)
@@ -40,6 +40,4 @@ test: all
 	node tests/run_tests.mjs
 
 clean:
-	rm -rf $(BINDIR)/eathonc $(BINDIR)/eatdb $(BINDIR)/libeathon_jni.so $(BINDIR)/eathonc.exe $(BINDIR)/eatdb.exe
-
-
+	rm -rf $(BINDIR)/eathon $(BINDIR)/eatdb $(BINDIR)/libeathon_jni.so $(BINDIR)/eathon.exe $(BINDIR)/eatdb.exe $(BINDIR)/eathonc $(BINDIR)/eathonc.exe

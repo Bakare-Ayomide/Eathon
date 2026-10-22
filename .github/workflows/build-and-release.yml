@@ -32,11 +32,12 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Compile Eathon Native Compiler (eathonc) & Database Engine (eatdb)
+      - name: Compile Eathon Native Compiler (eathon), Database Engine (eatdb) & JNI Library
         run: |
           mkdir -p bin
-          gcc -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eathonc.c -o bin/eathonc
-          gcc -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eatdb.c -o bin/eatdb
+          gcc -O2 -Wall -Wextra -Wno-format-truncation -Wno-stringop-truncation -std=c99 -Icompiler/include compiler/src/eathon.c -o bin/eathon
+          gcc -O2 -Wall -Wextra -Wno-format-truncation -Wno-stringop-truncation -std=c99 -Icompiler/include compiler/src/eatdb.c -o bin/eatdb
+          gcc -O2 -Wall -Wextra -Wno-format-truncation -Wno-stringop-truncation -std=c99 -Icompiler/include -fPIC -shared -DEATHON_LIB_MODE android/app/src/main/cpp/eathon_jni.c compiler/src/eathon.c compiler/src/eatdb.c -o bin/libeathon_jni.so
 
       - name: Run Automated Compiler & Database Verification Suite
         run: |
@@ -46,8 +47,8 @@ jobs:
         run: |
           python3 scripts/package_zip.py
           mkdir -p dist/linux-x86_64
-          cp bin/eathonc bin/eatdb dist/linux-x86_64/
-          cp -r stdlib examples grammar editors doc.md dist/linux-x86_64/
+          cp bin/eathon bin/eatdb bin/libeathon_jni.so dist/linux-x86_64/
+          cp -r stdlib examples spec editors doc.md dist/linux-x86_64/
           tar -czf dist/eathon-linux-x86_64.tar.gz -C dist/linux-x86_64 .
 
       - name: Upload Linux Native Artifacts & Complete Project ZIP
@@ -62,7 +63,7 @@ jobs:
   # 2. Windows x86_64 Native Build on Real Windows Runner (windows-latest)
   # ---------------------------------------------------------------------------
   windows-native-build:
-    name: Windows x86_64 Native Toolchain (eathonc.exe & eatdb.exe)
+    name: Windows x86_64 Native Toolchain (eathon.exe & eatdb.exe)
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -75,33 +76,34 @@ jobs:
           update: true
           install: mingw-w64-x86_64-gcc
 
-      - name: Compile Native Windows Executables (eathonc.exe & eatdb.exe)
+      - name: Compile Native Windows Executables (eathon.exe & eatdb.exe)
         shell: msys2 {0}
         run: |
           mkdir -p bin dist/windows-x86_64
-          gcc -O2 -Wall -Wextra -std=c99 -static -Icompiler/include compiler/src/eathonc.c -o bin/eathonc.exe
-          gcc -O2 -Wall -Wextra -std=c99 -static -Icompiler/include compiler/src/eatdb.c -o bin/eatdb.exe
+          gcc -O2 -Wall -Wextra -Wno-format-truncation -Wno-stringop-truncation -std=c99 -static -Icompiler/include compiler/src/eathon.c -o bin/eathon.exe
+          gcc -O2 -Wall -Wextra -Wno-format-truncation -Wno-stringop-truncation -std=c99 -static -Icompiler/include compiler/src/eatdb.c -o bin/eatdb.exe
 
-      - name: Verify eathonc.exe & eatdb.exe Execution on Native Windows OS
+      - name: Verify eathon.exe & eatdb.exe Execution on Native Windows OS
         shell: msys2 {0}
         run: |
-          ./bin/eathonc.exe examples/00_english_notes_intro.eat --run
-          ./bin/eathonc.exe examples/08_modules_and_recursion.eat -o bin/test_win.exe --cc gcc
+          ./bin/eathon.exe examples/00_english_notes_intro.eat --run
+          ./bin/eathon.exe examples/08_modules_and_recursion.eat -o bin/test_win.exe --cc gcc
           ./bin/test_win.exe
-          ./bin/eatdb.exe bin/win_verify.eatdb "Create collection win_nodes. Insert key 1, label win64, value 2025. Select all."
+          ./bin/eatdb.exe bin/win_verify.eatdb "Create collection winnodes. Insert key 1, label win64, value 2025. Select all."
 
       - name: Package Windows Toolchain, Runtime Header & Standard Library
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist/windows-x86_64/bin | Out-Null
           New-Item -ItemType Directory -Force -Path dist/windows-x86_64/include | Out-Null
-          Copy-Item bin/eathonc.exe dist/windows-x86_64/bin/
+          Copy-Item bin/eathon.exe dist/windows-x86_64/bin/
           Copy-Item bin/eatdb.exe dist/windows-x86_64/bin/
           Copy-Item compiler/include/eathon_platform.h dist/windows-x86_64/include/
           Copy-Item -Recurse stdlib dist/windows-x86_64/stdlib
           Copy-Item -Recurse examples dist/windows-x86_64/examples
+          Copy-Item -Recurse spec dist/windows-x86_64/spec
           Copy-Item -Recurse editors dist/windows-x86_64/editors
-          Copy-Item scripts/build_windows.bat dist/windows-x86_64/
+          Copy-Item build_windows.bat dist/windows-x86_64/
           Copy-Item doc.md dist/windows-x86_64/
           Compress-Archive -Path dist/windows-x86_64/* -DestinationPath dist/eathon-windows-x86_64.zip -Force
 
@@ -110,7 +112,7 @@ jobs:
         with:
           name: eathon-windows-x86_64
           path: |
-            bin/eathonc.exe
+            bin/eathon.exe
             bin/eatdb.exe
             dist/eathon-windows-x86_64.zip
 
@@ -127,16 +129,16 @@ jobs:
       - name: Compile Eathon on macOS with Clang
         run: |
           mkdir -p bin dist/macos
-          clang -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eathonc.c -o bin/eathonc
+          clang -O2 -Wall -Wextra -Wno-unused-function -std=c99 -Icompiler/include compiler/src/eathon.c -o bin/eathon
           clang -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eatdb.c -o bin/eatdb
-          ./bin/eathonc examples/00_english_notes_intro.eat --run
-          ./bin/eathonc examples/08_modules_and_recursion.eat -o bin/test_mac --cc clang
+          ./bin/eathon examples/00_english_notes_intro.eat --run
+          ./bin/eathon examples/08_modules_and_recursion.eat -o bin/test_mac --cc clang
           ./bin/test_mac
 
       - name: Archive macOS Artifacts
         run: |
-          cp bin/eathonc bin/eatdb dist/macos/
-          cp -r stdlib examples editors doc.md dist/macos/
+          cp bin/eathon bin/eatdb dist/macos/
+          cp -r stdlib examples spec editors doc.md dist/macos/
           tar -czf dist/eathon-macos.tar.gz -C dist/macos .
 
       - name: Upload macOS Artifact
@@ -163,21 +165,18 @@ jobs:
 
       - name: Setup Android SDK & NDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0 ndk;26.1.10909125 cmake;3.22.1'
 
-      - name: Install Android NDK & CMake Components
-        run: |
-          yes | sdkmanager --licenses || true
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;26.1.10909125" "cmake;3.22.1"
-
-      - name: Setup Gradle
+      - name: Setup Gradle 8.5
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.5'
 
-      - name: Build Android APK (Debug & Release Unsigned) with Native libeathon_jni.so
+      - name: Build Android APK (Debug) with Native libeathon_jni.so
         working-directory: android
         run: |
-          gradle assembleDebug
+          gradle assembleDebug --no-daemon --stacktrace
           mkdir -p ../dist
           cp app/build/outputs/apk/debug/app-debug.apk ../dist/eathon-studio-android.apk
 
@@ -212,7 +211,7 @@ jobs:
           files: |
             release-assets/eathon-linux-x86_64-and-project-zip/public/eathon-project.zip
             release-assets/eathon-linux-x86_64-and-project-zip/dist/eathon-linux-x86_64.tar.gz
-            release-assets/eathon-windows-x86_64/bin/eathonc.exe
+            release-assets/eathon-windows-x86_64/bin/eathon.exe
             release-assets/eathon-windows-x86_64/bin/eatdb.exe
             release-assets/eathon-windows-x86_64/dist/eathon-windows-x86_64.zip
             release-assets/eathon-macos/dist/eathon-macos.tar.gz

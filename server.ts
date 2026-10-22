@@ -7,23 +7,26 @@ import { runAllAutomatedTests } from './tests/run_tests.mjs';
 
 const ROOT_DIR = process.cwd();
 const BIN_DIR = path.join(ROOT_DIR, 'bin');
-const EATHONC_BIN = path.join(BIN_DIR, 'eathonc');
+const EATHON_BIN = path.join(BIN_DIR, 'eathon');
 const EATDB_BIN = path.join(BIN_DIR, 'eatdb');
 
 function ensureCompilerBuilt() {
   if (!fs.existsSync(BIN_DIR)) {
     fs.mkdirSync(BIN_DIR, { recursive: true });
   }
-  if (!fs.existsSync(EATHONC_BIN)) {
+  if (!fs.existsSync(EATHON_BIN)) {
     execFileSync('gcc', [
       '-O2',
       '-std=c99',
       '-Icompiler/include',
       '-D_POSIX_C_SOURCE=200809L',
-      path.join(ROOT_DIR, 'compiler/src/eathonc.c'),
+      path.join(ROOT_DIR, 'compiler/src/eathon.c'),
       '-o',
-      EATHONC_BIN,
+      EATHON_BIN,
     ]);
+  }
+  if (fs.existsSync(EATHON_BIN)) {
+    fs.chmodSync(EATHON_BIN, 0o755);
   }
   if (!fs.existsSync(EATDB_BIN)) {
     execFileSync('gcc', [
@@ -35,6 +38,9 @@ function ensureCompilerBuilt() {
       '-o',
       EATDB_BIN,
     ]);
+  }
+  if (fs.existsSync(EATDB_BIN)) {
+    fs.chmodSync(EATDB_BIN, 0o755);
   }
 }
 
@@ -82,14 +88,14 @@ async function startServer() {
     } catch {
       // ignore
     }
-    const eathoncStat = fs.existsSync(EATHONC_BIN) ? fs.statSync(EATHONC_BIN).size : 0;
+    const eathonStat = fs.existsSync(EATHON_BIN) ? fs.statSync(EATHON_BIN).size : 0;
     const eatdbStat = fs.existsSync(EATDB_BIN) ? fs.statSync(EATDB_BIN).size : 0;
 
     res.json({
       kernel: uname,
       hostCompiler: gccVersion,
-      eathoncBinaryPath: 'bin/eathonc',
-      eathoncBinaryBytes: eathoncStat,
+      eathonBinaryPath: 'bin/eathon',
+      eathonBinaryBytes: eathonStat,
       eatdbBinaryPath: 'bin/eatdb',
       eatdbBinaryBytes: eatdbStat,
       targets: [
@@ -120,7 +126,7 @@ async function startServer() {
       'doc.md',
       '.github/workflows/build-and-release.yml',
       'compiler/include/eathon_platform.h',
-      'compiler/src/eathonc.c',
+      'compiler/src/eathon.c',
       'compiler/src/eatdb.c',
       'android/app/build.gradle',
       'android/app/src/main/AndroidManifest.xml',
@@ -195,7 +201,7 @@ async function startServer() {
     }
   });
 
-  // 3. Compile & Execute .eat Source Code via Native C Compiler (bin/eathonc)
+  // 3. Compile & Execute .eat Source Code via Native C Compiler (bin/eathon)
   app.post('/api/compile', (req, res) => {
     try {
       const source = typeof req.body?.source === 'string' ? req.body.source : '';
@@ -214,7 +220,7 @@ async function startServer() {
       let compilerRaw = '';
       try {
         compilerRaw = execFileSync(
-          EATHONC_BIN,
+          EATHON_BIN,
           [srcPath, '-o', elfPath, '--pe', pePath, '--llvm', llPath, '--c', cPath, '--json'],
           { encoding: 'utf8', timeout: 5000 }
         );

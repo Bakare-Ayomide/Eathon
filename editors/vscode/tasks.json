@@ -4,9 +4,9 @@
     {
       "label": "Eathon: Run Current .eat Program (--run)",
       "type": "shell",
-      "command": "${workspaceFolder}/bin/eathonc",
+      "command": "${workspaceFolder}/bin/eathon",
       "windows": {
-        "command": "${workspaceFolder}\\bin\\eathonc.exe"
+        "command": "${workspaceFolder}\\bin\\eathon.exe"
       },
       "args": [
         "${file}",
@@ -25,9 +25,9 @@
     {
       "label": "Eathon: Compile Current .eat File to Native Binary (C99 + GCC)",
       "type": "shell",
-      "command": "${workspaceFolder}/bin/eathonc",
+      "command": "${workspaceFolder}/bin/eathon",
       "windows": {
-        "command": "${workspaceFolder}\\bin\\eathonc.exe"
+        "command": "${workspaceFolder}\\bin\\eathon.exe"
       },
       "args": [
         "${file}",

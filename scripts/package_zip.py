@@ -14,7 +14,7 @@ INCLUDE_FILES = [
     "spec/GRAMMAR.ebnf",
     ".github/workflows/build-and-release.yml",
     "compiler/include/eathon_platform.h",
-    "compiler/src/eathonc.c",
+    "compiler/src/eathon.c",
     "compiler/src/eatdb.c",
     "tests/run_tests.mjs",
     "stdlib/mathlib.eat",
@@ -38,10 +38,10 @@ INCLUDE_FILES = [
     "android/app/src/main/res/layout/activity_main.xml",
     "android/app/src/main/res/values/strings.xml",
     "android/app/src/main/res/values/colors.xml",
-    "bin/eathonc",
+    "bin/eathon",
     "bin/eatdb",
     "bin/libeathon_jni.so",
-    "bin/eathonc.exe",
+    "bin/eathon.exe",
     "bin/eatdb.exe",
 ]
 
@@ -52,8 +52,9 @@ for fname in sorted(os.listdir(os.path.join(ROOT, "examples"))):
 with zipfile.ZipFile(ZIP_PATH, "w", compression=zipfile.ZIP_DEFLATED) as zf:
     for rel_path in INCLUDE_FILES:
         abs_path = os.path.join(ROOT, rel_path)
-        if os.path.exists(abs_path):
-            zf.write(abs_path, arcname=f"eathon/{rel_path}")
+        if not os.path.exists(abs_path):
+            raise FileNotFoundError(f"Required package file missing: {rel_path}")
+        zf.write(abs_path, arcname=f"eathon/{rel_path}")
 
 print(f"Created {ZIP_PATH} ({os.path.getsize(ZIP_PATH)} bytes) with {len(INCLUDE_FILES)} files.")
 with zipfile.ZipFile(ZIP_PATH, "r") as zf:

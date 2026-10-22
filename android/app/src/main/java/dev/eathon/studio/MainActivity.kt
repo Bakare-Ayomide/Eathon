@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun runEmbeddedDatabaseDemo() {
         val dbFile = File(filesDir, "android_studio.eatdb")
-        val script = "Create collection mobile_nodes. Begin. Insert key 1, label arm64_core, value 900. Commit. Select all."
+        val script = "Create collection mobilenodes. Begin. Insert key 1, label arm64core, value 900. Commit. Select all."
         val rawJson = EathonBridge.executeEatDbNative(dbFile.absolutePath, script)
         consoleOutput.text = "=== EATHONDB PERSISTENT SLOTTED-PAGE ENGINE ===\nDB Path: ${dbFile.absolutePath}\nQuery: $script\n\nResult JSON:\n$rawJson"
     }

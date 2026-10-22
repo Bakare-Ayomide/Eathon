@@ -8,17 +8,17 @@ if not exist bin mkdir bin
 
 where gcc >nul 2>nul
 if %ERRORLEVEL% EQU 0 (
-    echo [Eathon] Building eathonc.exe and eatdb.exe using GCC...
-    gcc -O2 -Wall -Wextra -std=c99 compiler/src/eathonc.c -o bin/eathonc.exe
-    gcc -O2 -Wall -Wextra -std=c99 compiler/src/eatdb.c -o bin/eatdb.exe
+    echo [Eathon] Building eathon.exe and eatdb.exe using GCC...
+    gcc -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eathon.c -o bin/eathon.exe
+    gcc -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eatdb.c -o bin/eatdb.exe
     goto :done
 )
 
 where clang >nul 2>nul
 if %ERRORLEVEL% EQU 0 (
-    echo [Eathon] Building eathonc.exe and eatdb.exe using LLVM Clang...
-    clang -O2 -Wall -Wextra -std=c99 compiler/src/eathonc.c -o bin/eathonc.exe
-    clang -O2 -Wall -Wextra -std=c99 compiler/src/eatdb.c -o bin/eatdb.exe
+    echo [Eathon] Building eathon.exe and eatdb.exe using LLVM Clang...
+    clang -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eathon.c -o bin/eathon.exe
+    clang -O2 -Wall -Wextra -std=c99 -Icompiler/include compiler/src/eatdb.c -o bin/eatdb.exe
     goto :done
 )
 
@@ -27,7 +27,7 @@ echo Please install MinGW-w64 (w64devkit / MSYS2) or LLVM for Windows.
 exit /b 1
 
 :done
-echo [Eathon] Build complete: bin\eathonc.exe and bin\eatdb.exe
+echo [Eathon] Build complete: bin\eathon.exe and bin\eatdb.exe
 echo [Eathon] Compiling and running example 01...
-bin\eathonc.exe examples\01_variables_and_arithmetic.eat -o program.exe --cc gcc
+bin\eathon.exe examples\01_variables_and_arithmetic.eat -o program.exe --cc gcc
 program.exe

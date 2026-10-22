@@ -96,8 +96,8 @@ interface RepoFile {
 interface EnvironmentInfo {
   kernel: string;
   hostCompiler: string;
-  eathoncBinaryPath: string;
-  eathoncBinaryBytes: number;
+  eathonBinaryPath: string;
+  eathonBinaryBytes: number;
   eatdbBinaryPath: string;
   eatdbBinaryBytes: number;
   targets: string[];
@@ -434,7 +434,7 @@ export default function App() {
 
   // Internals browser state
   const [selectedRepoFile, setSelectedRepoFile] = useState<string>(
-    'compiler/src/eathonc.c'
+    'compiler/src/eathon.c'
   );
   const [codeSearch, setCodeSearch] = useState<string>('');
 
@@ -766,14 +766,14 @@ export default function App() {
       <div className="px-6 py-2.5 border-b border-slate-800/80 bg-[#0B0F17] flex flex-wrap items-center justify-between gap-4 text-xs text-slate-400 font-mono tabular-nums">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-slate-200 font-medium">
-            Toolchain: eathonc v1.1.0-audited (Linux ELF64 + MinGW-w64 Win64 .exe + C99)
+            Toolchain: eathon v1.2.1-audited (Linux ELF64 + MinGW-w64 Win64 .exe + Android JNI + C99)
           </span>
           <span aria-hidden="true">·</span>
           <span>Host: {envInfo?.kernel || 'Linux x86_64'}</span>
           <span aria-hidden="true">·</span>
           <span>
-            Compiler Binary: {envInfo?.eathoncBinaryPath || 'bin/eathonc'} (
-            {envInfo ? `${(envInfo.eathoncBinaryBytes / 1024).toFixed(1)} KB` : '87.2 KB'})
+            Compiler Binary: {envInfo?.eathonBinaryPath || 'bin/eathon'} (
+            {envInfo ? `${(envInfo.eathonBinaryBytes / 1024).toFixed(1)} KB` : '96.0 KB'})
           </span>
           <span aria-hidden="true">·</span>
           <span>
@@ -1704,7 +1704,7 @@ export default function App() {
                 </h1>
                 <p className="text-sm text-slate-400 mt-1">
                   Inspect the actual ISO C99 source files compiled by GCC into
-                  bin/eathonc and bin/eatdb.
+                  bin/eathon and bin/eatdb.
                 </p>
               </div>
               <div className="flex items-center gap-2 bg-[#0F172A] px-3 py-1.5 rounded-lg border border-slate-800">
@@ -1816,10 +1816,10 @@ export default function App() {
                         2. Native Compiler &amp; Linker
                       </td>
                       <td className="py-3 px-4">
-                        Written in ISO C99 (compiler/src/eathonc.c). Direct
+                        Written in ISO C99 (compiler/src/eathon.c). Direct
                         standalone Linux x86_64 ELF64 binary emission &amp;
-                        kernel execution, Windows x86_64 PE64 (.exe) header &amp;
-                        code emission, LLVM IR (.ll), and C99 (.c) generation.
+                        kernel execution, Windows x86_64 PE64 (.exe) via
+                        MinGW-w64/Clang, Android JNI shared library, LLVM IR (.ll), and C99 (.c) generation.
                       </td>
                       <td className="py-3 px-4 text-slate-400">
                         ARM64 (AArch64) instruction encoder, DWARF v5 debug

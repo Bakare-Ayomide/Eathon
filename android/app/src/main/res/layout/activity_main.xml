@@ -28,7 +28,7 @@
             android:textColor="#10B981"
             android:fontFamily="monospace"
             android:textSize="11sp"
-            android:text="eathonc native JNI ready" />
+            android:text="eathon native JNI ready" />
     </LinearLayout>
 
     <!-- Action Toolbar (Run, Open .eat, Save .eat, Import Folder, Export C99, EathonDB) -->

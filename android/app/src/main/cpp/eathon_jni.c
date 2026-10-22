@@ -4,14 +4,14 @@
  * Package: dev.eathon.studio
  *
  * Bridges the native Kotlin Android UI (EathonStudio, inspired by Pydroid)
- * directly to the C99 Eathon Compiler (compiler/src/eathonc.c) and EathonDB
+ * directly to the C99 Eathon Compiler (compiler/src/eathon.c) and EathonDB
  * Storage Engine (compiler/src/eatdb.c) inside libeathon_jni.so.
  *
  * Why In-Process Native Execution on Android:
  *   Android 10+ (API 29+) enforces W^X and mounts app-writable directories
  *   (getFilesDir(), getCacheDir(), /sdcard) with MS_NOEXEC, preventing apps
  *   from calling execve() on dynamically emitted ELF binaries in app storage.
- *   By compiling eathonc.c and eatdb.c directly into libeathon_jni.so (which
+ *   By compiling eathon.c and eatdb.c directly into libeathon_jni.so (which
  *   resides in the APK's executable nativeLibraryDir), Eathon programs are
  *   lexed, parsed, typechecked, compiled to C99/LLVM IR, and executed at
  *   native speed offline on Android.
@@ -47,7 +47,7 @@ struct JNINativeInterface {
 #define JNICALL
 #endif
 
-/* External entry points from compiler/src/eathonc.c and compiler/src/eatdb.c */
+/* External entry points from compiler/src/eathon.c and compiler/src/eatdb.c */
 extern int eathon_compile_and_run_buffer(const char *source_code,
                                          const char *source_path,
                                          char *out_stdout_buf,
@@ -178,7 +178,7 @@ Java_dev_eathon_studio_EathonBridge_getCompilerInfoNative(JNIEnv *env, jobject t
     (void)thiz;
     char info[256];
     snprintf(info, sizeof(info),
-             "eathonc v1.0.2-native (%s / %s) + eatdb v1.0.2 slotted-page WAL engine",
+             "eathon v1.0.2-native (%s / %s) + eatdb v1.0.2 slotted-page WAL engine",
              EATHON_PLATFORM_NAME, EATHON_ARCH_NAME);
     return (*env)->NewStringUTF(env, info);
 }

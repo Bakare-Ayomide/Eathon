@@ -3,10 +3,12 @@ import fs from 'fs';
 import path from 'path';
 
 const ROOT_DIR = process.cwd();
-const EATHONC_BIN = path.join(ROOT_DIR, 'bin', 'eathonc');
+const EATHON_BIN = path.join(ROOT_DIR, 'bin', 'eathon');
 const EATDB_BIN = path.join(ROOT_DIR, 'bin', 'eatdb');
 
 export function runAllAutomatedTests() {
+  if (fs.existsSync(EATHON_BIN)) fs.chmodSync(EATHON_BIN, 0o755);
+  if (fs.existsSync(EATDB_BIN)) fs.chmodSync(EATDB_BIN, 0o755);
   const results = [];
   const startAll = Date.now();
 
@@ -42,7 +44,7 @@ export function runAllAutomatedTests() {
     fs.writeFileSync(srcFile, sourceCode, 'utf8');
 
     const compilerJsonRaw = execFileSync(
-      EATHONC_BIN,
+      EATHON_BIN,
       [srcFile, '-o', binFile, '--llvm', llFile, '--c', cFile, '--json'],
       { encoding: 'utf8' }
     );
@@ -248,7 +250,7 @@ export function runAllAutomatedTests() {
       fs.writeFileSync(badFile, 'Let score = 100;\n', 'utf8');
       let out = '';
       try {
-        out = execFileSync(EATHONC_BIN, [badFile, '--json'], { encoding: 'utf8' });
+        out = execFileSync(EATHON_BIN, [badFile, '--json'], { encoding: 'utf8' });
       } catch (e) {
         out = e.stdout ? e.stdout.toString() : '';
       }
@@ -270,7 +272,7 @@ export function runAllAutomatedTests() {
       fs.writeFileSync(badSynFile, 'Let alpha be integer 10\nLet beta be integer 20.\n', 'utf8');
       let out = '';
       try {
-        out = execFileSync(EATHONC_BIN, [badSynFile, '--json'], { encoding: 'utf8' });
+        out = execFileSync(EATHON_BIN, [badSynFile, '--json'], { encoding: 'utf8' });
       } catch (e) {
         out = e.stdout ? e.stdout.toString() : '';
       }
@@ -292,7 +294,7 @@ export function runAllAutomatedTests() {
       fs.writeFileSync(badSemFile, 'Display unknownVariable.\n', 'utf8');
       let out = '';
       try {
-        out = execFileSync(EATHONC_BIN, [badSemFile, '--json'], { encoding: 'utf8' });
+        out = execFileSync(EATHON_BIN, [badSemFile, '--json'], { encoding: 'utf8' });
       } catch (e) {
         out = e.stdout ? e.stdout.toString() : '';
       }
@@ -331,7 +333,7 @@ export function runAllAutomatedTests() {
         'utf8'
       );
       execFileSync(
-        EATHONC_BIN,
+        EATHON_BIN,
         [srcFile, '-o', binFile, '--cc', 'gcc', '--c', cFile, '--llvm', llFile],
         { encoding: 'utf8' }
       );
@@ -425,12 +427,12 @@ export function runAllAutomatedTests() {
   addTest(
     'TEST-15',
     'Windows Portability',
-    'Genuine Cross-Compiled 64-bit Windows Executables (bin/eathonc.exe & bin/eatdb.exe)',
+    'Genuine Cross-Compiled 64-bit Windows Executables (bin/eathon.exe & bin/eatdb.exe)',
     () => {
-      const winCompiler = path.join(ROOT_DIR, 'bin', 'eathonc.exe');
+      const winCompiler = path.join(ROOT_DIR, 'bin', 'eathon.exe');
       const winDb = path.join(ROOT_DIR, 'bin', 'eatdb.exe');
       if (!fs.existsSync(winCompiler) || !fs.existsSync(winDb)) {
-        throw new Error('Missing bin/eathonc.exe or bin/eatdb.exe');
+        throw new Error('Missing bin/eathon.exe or bin/eatdb.exe');
       }
       const fileOut = execFileSync('file', [winCompiler, winDb], { encoding: 'utf8' });
       if (!fileOut.includes('PE32+ executable (console) x86-64, for MS Windows')) {
@@ -438,7 +440,7 @@ export function runAllAutomatedTests() {
       }
       const cSize = fs.statSync(winCompiler).size;
       const dSize = fs.statSync(winDb).size;
-      return `Verified PE32+ x86-64 Windows executables: eathonc.exe (${cSize}B), eatdb.exe (${dSize}B)`;
+      return `Verified PE32+ x86-64 Windows executables: eathon.exe (${cSize}B), eatdb.exe (${dSize}B)`;
     }
   );
 
@@ -488,7 +490,7 @@ export function runAllAutomatedTests() {
         ].join('\n'),
         'utf8'
       );
-      const out = execFileSync(EATHONC_BIN, [srcFile, '--run'], { encoding: 'utf8' }).trim();
+      const out = execFileSync(EATHON_BIN, [srcFile, '--run'], { encoding: 'utf8' }).trim();
       const lines = out.split(/\r?\n/).map((s) => s.trim());
       if (lines.join(',') !== 'Hello Chris,120,42') {
         throw new Error(`Expected 'Hello Chris,120,42', got '${lines.join(',')}'`);
@@ -515,7 +517,7 @@ export function runAllAutomatedTests() {
             '-shared',
             '-DEATHON_LIB_MODE',
             'android/app/src/main/cpp/eathon_jni.c',
-            'compiler/src/eathonc.c',
+            'compiler/src/eathon.c',
             'compiler/src/eatdb.c',
             '-o',
             soPath,
@@ -535,7 +537,7 @@ export function runAllAutomatedTests() {
           'int main(void) {',
           '  char buf[16384];',
           '  const char *prog = "Let a be 21.\\nDisplay a times 2.\\n";',
-          '  int rc = eathon_jni_compile_and_run_json(prog, "jni_test.eat", buf, sizeof(buf));',
+          '  int rc = eathon_jni_compile_and_run_json(prog, "/tmp/jni_test.eat", buf, sizeof(buf));',
           '  printf("%s\\n", buf);',
           '  return rc;',
           '}',
@@ -565,11 +567,15 @@ export function runAllAutomatedTests() {
       const wf = fs.readFileSync(wfPath, 'utf8');
       const requiredTokens = [
         'linux-build-and-test:',
+        'cp -r stdlib examples spec editors doc.md dist/linux-x86_64/',
         'windows-native-build:',
         'runs-on: windows-latest',
-        'eathonc.exe',
-        'eatdb.exe',
+        'bin/eathon.exe',
+        'bin/eatdb.exe',
+        'Copy-Item build_windows.bat dist/windows-x86_64/',
         'android-apk-build:',
+        'android-actions/setup-android@v3',
+        "packages: 'platform-tools platforms;android-34 build-tools;34.0.0 ndk;26.1.10909125 cmake;3.22.1'",
         'eathon-studio-android.apk',
         'softprops/action-gh-release@v2',
       ];
@@ -578,7 +584,36 @@ export function runAllAutomatedTests() {
           throw new Error(`Workflow missing required section: ${tok}`);
         }
       }
-      return 'Verified multi-platform GitHub Actions workflow (Linux, Windows, macOS, Android APK & GitHub Releases)';
+      if (
+        wf.includes('eathonc') ||
+        wf.includes('scripts/build_windows.bat') ||
+        wf.includes('cp -r stdlib examples grammar') ||
+        wf.includes('sdkmanager tools')
+      ) {
+        throw new Error('Workflow contains legacy eathonc, wrong build_windows.bat path, missing grammar folder, or invalid sdkmanager tools');
+      }
+      // Verify the exact Windows CI eatdb query (winnodes) succeeds and '_' is strictly rejected
+      const winDbTest = '/tmp/test_win_verify.eatdb';
+      if (fs.existsSync(winDbTest)) fs.unlinkSync(winDbTest);
+      const winRaw = execFileSync(
+        EATDB_BIN,
+        [winDbTest, 'Create collection winnodes. Insert key 1, label win64, value 2025. Select all.'],
+        { encoding: 'utf8' }
+      );
+      const winParsed = JSON.parse(winRaw);
+      if (!winParsed.success || winParsed.collection !== 'winnodes') {
+        throw new Error(`Windows CI eatdb query failed: ${winRaw}`);
+      }
+      let rejectedUnderscore = false;
+      try {
+        execFileSync(EATDB_BIN, [winDbTest, 'Create collection win_nodes.'], { encoding: 'utf8' });
+      } catch {
+        rejectedUnderscore = true;
+      }
+      if (!rejectedUnderscore) {
+        throw new Error('Expected eatdb to reject underscore (_) punctuation');
+      }
+      return 'Verified multi-platform GitHub Actions workflow (Linux spec/, Windows eathon.exe & winnodes, Android setup-android@v3 packages)';
     }
   );
 

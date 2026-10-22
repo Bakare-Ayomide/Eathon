@@ -13,11 +13,25 @@ add_library(
     eathon_jni
     SHARED
     eathon_jni.c
-    "${EATHON_ROOT}/compiler/src/eathonc.c"
+    "${EATHON_ROOT}/compiler/src/eathon.c"
     "${EATHON_ROOT}/compiler/src/eatdb.c"
 )
 
-target_compile_definitions(eathon_jni PRIVATE EATHON_LIB_MODE=1)
+target_compile_definitions(
+    eathon_jni
+    PRIVATE
+    EATHON_LIB_MODE=1
+    _DEFAULT_SOURCE=1
+    _POSIX_C_SOURCE=200809L
+)
+
+target_compile_options(
+    eathon_jni
+    PRIVATE
+    -O2
+    -Wno-unused-function
+    -Wno-format-truncation
+)
 
 find_library(log-lib log)
 if(log-lib)
